@@ -1,22 +1,6 @@
--- [Required imports] ---------------------------------------------------------
--- Do not change this, you can ignore it, it's for the test harness.
--- DO NOT USE EXCEPTIONS or `error` IN YOUR CODE!
 import qualified Control.Exception as Excep
--- Bring in the file IO functions.
 import System.IO                            
 import System.Directory
-
--- [Optional imports] ---------------------------------------------------------
--- If you wish, you may import other modules immediately below this comment.
--- The problems are designed so you don't need to do so.
-
-
-
--- [Given types] --------------------------------------------------------------
--- The types in this section are defined for you.  DO NOT CHANGE THEM.
--- The deriving Show and Eq types are purely for debugging and the test harness
--- so do not change them either - note, those automatically derived functions
--- may not behave the way the problem specifies.
 
 -- |A representation of 2D coordinates as a pair of ints.
 -- Used to represent a position in a 2D grid.
@@ -61,19 +45,7 @@ data Player = Player String Coord Int [Item]
     deriving (Eq, Show)
 
 
--- [Questions] ----------------------------------------------------------------
--- You should implement the functions as specified below.
--- Skeletons of each function have been provided with the correct types, and
--- an implementation that uses `error` to immediately crash.  You should delete 
--- the `error` call and correctly implement the function.
--- You may define additional functions or types as you desire to help you
--- complete each question.
--- DO NOT CHANGE THE TYPES OF THE FUNCTIONS.
-
-
-
--- Q 1) Write the two functions below to return the width and height of a game map.
--- 2 marks.
+-- The two functions below return the width and height of a game map.
 
 getHeight :: GameMap -> Int
 getHeight (GameMap []) = 0
@@ -85,18 +57,16 @@ getWidth (GameMap []) = 0
 getWidth (GameMap (x:g)) = length x
 
 
--- Q 2) Write the function below to return whether a coordinate is inside a map or not.
--- 2 marks.
+-- The function below returns whether a coordinate is inside a map or not.
 
 isInBounds :: GameMap -> Coord -> Bool
 isInBounds (GameMap []) _ = False
 isInBounds g (x, y) = (getWidth g) > x && (getHeight g) > y && x >= 0 && y >= 0
 
 
--- Q 3) Write the function below to take a coordinate and generate a new one 1 step in the
--- given direction.  This function should ignore the bounds of the map and calculate the
+-- The function below takes a coordinate and generates a new one 1 step in the
+-- given direction.  This function ignores the bounds of the map and calculate the
 -- coordinate regardless.
--- 1 mark. 
 
 offsetCoord :: Coord -> Dir -> Coord
 offsetCoord (x, y) d = case d of 
@@ -106,18 +76,17 @@ offsetCoord (x, y) d = case d of
         West  -> (x - 1, y)  
 
 
--- Q 4) Write the function below to return the terrain at a specific location in a map
+-- The function below returns the terrain at a specific location in a map
 -- only if the coordinates are in bounds.
--- 3 marks.
+
 getTile :: GameMap -> Coord -> Maybe Terrain
 getTile (GameMap g) (x, y)
     | isInBounds (GameMap g) (x, y) = Just ((g !! y) !! x)
     | otherwise = Nothing 
 
 
--- Q 5) Write the function below to return True if the terrain at the given location is
+-- The function below return True if the terrain at the given location is
 -- passable.  Passable terrain are floors and open doors.  Nothing out of bounds is passable.
--- 2 marks.
 
 isPassable :: GameMap -> Coord -> Bool
 isPassable (GameMap g) (x, y)
@@ -128,11 +97,10 @@ isPassable (GameMap g) (x, y)
         tile = getTile (GameMap g) (x, y)
 
 
--- Q 6) Write the function below which takes a gamemap, coordinate, and a direction, and
+-- The function below takes a gamemap, coordinate, and a direction, and
 -- returns a new coordinate which is the result of that move with an Either type.
--- If the move was possible then the result should be (Right) with the new coord.
--- If the move was not possible then the result should be (Left) with the current coord.
--- 3 marks.
+-- If the move was possible then the result is (Right) with the new coord.
+-- If the move was not possible then the result is (Left) with the current coord.
 
 move :: GameMap -> Coord -> Dir -> Either Coord Coord
 move g c d 
@@ -142,29 +110,20 @@ move g c d
     where
         w = offsetCoord c d
 
--- Q 7) Write the function below to create a new player with the given name but otherwise
+-- The function below creates a new player with the given name but otherwise
 -- default values of 100 health, no items, and a position of (1,1).
--- 1 mark.
 
 newPlayer :: String -> Player
 newPlayer n = Player n (1,1) 100 []
 
 
--- Q 8) Write the function below to create a "status line" string describing the current
+-- The function below creates a "status line" string describing the current
 -- state of the player.
--- The line should be formatted as follows, with commas and spacing as seen in the examples:
+-- The line is formatted as follows, with commas and spacing as seen in the examples:
 -- the line starts with "Hero" then the player name, then their HP followed by "HP",
 -- then "wielding " followed by either the weapon name or "(nothing)", then "wearing", followed
 -- by the helm, armour, and boots names or "(no helm)", "(no armour)", "(no boots)".  The boots
--- are the last element of the list so should have "and" before and a full stop after.
--- See these two examples for the expected formatting, spacing, and punctuation:
--- (Player "Ray" (12,63) 94 [(Item "T-Shirt of Defiance" Armour 12), (Item "dagger" Weapon 8), (Item "leather boots" Boots 4), (Item "mining cap" Helm 6)])
---    should return
--- "Hero Ray, 94 HP, wielding dagger, wearing mining cap, T-Shirt of Defiance, and leather boots."
--- (Player "Jim" (1,1) 12 [])
---    should return
--- "Hero Jim, 12 HP, wielding (nothing), wearing (no helm), (no armour), and (no boots)."
--- 5 marks.
+-- are the last element of the list so they have "and" before and a full stop after.
 
 defaultNames :: Slot -> String
 defaultNames Weapon = "(nothing)"
@@ -189,10 +148,9 @@ playerStatus (Player n _ hp it) =
         armour = getItem Armour it 
         boots  = getItem Boots it
     
--- Q 9) A player can only hold 1 item of each type at a time.  Write the function below to
--- pick up the given item.  If there is already an item of that type then the new item
--- should replace that.  Return the new state of the player.
--- 3 marks.
+-- A player can only hold 1 item of each type at a time.  The function below
+-- picks up a given item.  If there is already an item of that type then the new item
+-- replaces that. Then return the new state of the player.
 
 pickupItem :: Player -> Item -> Player
 pickupItem (Player n ps hp it) i =
@@ -201,10 +159,9 @@ pickupItem (Player n ps hp it) i =
         (Item _ newS _) = i
         upIt = (i: filter (\(Item _ s _) -> s /= newS) it)
 
--- Q 10) Write the function below to replace the terrain at the given coordinate of a game map 
--- with a new one, returning the new game map.  If the coordinates are invalid then return the
+-- The function below replaces the terrain at the given coordinate of a game map 
+-- with a new one, returning the new game map.  If the coordinates are invalid then returns the
 -- map unchanged.
--- 5 marks.
 
 updateMap :: GameMap -> Coord -> Terrain -> GameMap
 updateMap (GameMap []) _ _ = (GameMap [])
@@ -219,10 +176,10 @@ updateList (x:xs) 0 newV = newV : xs
 updateList (x:xs) n newV = x : updateList xs (n-1) newV
 
 
--- Q 11) Write the function below to open/close a door that is next to the given coordinate in the
--- specified direction.  Return the new state of the game map.  If there is no door or the coordinate
+-- The function below open/close a door that is next to the given coordinate in the
+-- specified direction.  Returns the new state of the game map.  If there is no door or the coordinate
 -- is invalid, the game map is returned unchanged.
--- 5 marks.
+
 tryOpenDoor :: GameMap -> Coord -> Dir -> GameMap
 tryOpenDoor g c dir 
     | isDoor maybeDoorTile = updateMap g maybeDoor (Door (openCloseDoor doorState))
@@ -241,13 +198,10 @@ openCloseDoor :: DoorState -> DoorState
 openCloseDoor Open = Closed
 openCloseDoor Closed = Open
 
--- Q 12) Write the two functions below to visually display the GameMap as grid of characters
--- in a single String.  Each line should be terminated by a newline in the string.
--- Floor tiles should appear as '.', walls are '#', water as '~', open doors as '-', and
--- closed doors as '+'.
--- Note that after you implement renderMap, you can "pretty print" your maps with
--- `putStrLn (renderMap testMap1)` which might help you in debugging other functions.
--- 3 marks.
+-- The two functions below visually display the GameMap as grid of characters
+-- in a single String.  Each line is terminated by a newline in the string.
+-- Floor tiles appear as '.', walls are '#', water is '~', open doors are '-', and
+-- closed doors are '+'.
 
 renderTerrain :: Terrain -> Char
 renderTerrain t = case t of 
@@ -265,13 +219,12 @@ renderMap (GameMap g) = unlines (map renderRow g)
         renderRow = map renderTerrain
 
 
--- Q 13) Write the function below which when given a filename, loads and parses the contents
+-- The function below which when given a filename, loads and parses the contents
 -- of it as a game map, returning the map or Nothing if the contents of the file are invalid
 -- or the file does not exist.
--- The contents of the file should be a a series of lines of all the same length, containing the
+-- The contents of the file are a series of lines of all the same length, containing the
 -- same characters with the same meaning as the characters used to render the terrain.  Each
 -- line is ended with a newline character.
--- 5 marks.
 
 unRenderTerrain :: Char -> Maybe Terrain
 unRenderTerrain t = case t of 
@@ -298,17 +251,13 @@ loadMap fileName = do
         else do 
             pure Nothing
 
--- Q 14) Navigating long distances through empty areas can be annoying when having to move each step
--- manually.  Write the function below which will take a starting location and a destination location
--- and calculate a path between the two.  The path must involve only passable tiles.  Open doors can be
--- passed but closed doors can't - don't include opening any doors to check for routes.
--- The exact algorithm is not specified but should be reasonably direct rather than needlessly wandering
--- around, must find a route if one exists, and must finish within a reasonable time (<5 seconds for a
--- 50x50 map).
--- The return value should be a list of coordinates which represent each step in the path - include the
+-- Navigating long distances through empty areas can be annoying when having to move each step
+-- manually.  The function below takes a starting location and a destination location
+-- and calculates a path between the two.  The path must involve only passable tiles.  Open doors can be
+-- passed but closed doors can't - doesn't include opening any doors to check for routes.
+-- The return value is a list of coordinates which represent each step in the path - including the
 -- destination but not the starting point.
--- If no route is possible or the destination is the start point, return the empty list.
--- 5 marks.
+-- If no route is possible or the destination is the start point, returns an empty list.
 
 isValidCoord :: GameMap -> [Coord] -> Coord -> Bool
 isValidCoord g visited coord =
@@ -332,27 +281,6 @@ searchPath g visited current dest
             []-> []
             (p:_) -> current : p
 
-
-
--- Q 15) Not an actual question, this "question" is worth 5 marks and will be based
--- on the use of good Haskell coding style in your solutions.  This includes things like
--- appropriately sized functions; re-use of existing functions and types instead of reimplementing them;
--- idiomatic use of functional programming techniques like recusion, higher-order functions,
--- and pattern matching; identifier naming; and code layout.
--- 5 marks for good Haskell coding style.
-
--- Total 50 marks available.
--- Questions end here.
-
--- [Testing framework] --------------------------------------------------------
--- DO NOT CHANGE OR ADD ANYTHING BELOW THIS LINE.
--- This section contains some test values and a small testing framework that
--- you can use to partially test the correctness of your function implementation.
--- This is not an exhaustive range of tests for every function and may omit
--- important cases.
--- This deliberately does not use a standard Haskell testing framework to avoid
--- bringing in external modules or language extensions - don't do it this way
--- yourself in the future (look at something like HSpec instead)!
 
 -- |A generic small map with a room and two doors.
 -- Features all terrain types.
@@ -398,7 +326,7 @@ yn :: Bool -> String
 yn True = "[✓ OK]"
 yn False = "[❌ FAIL]"
 
--- |Run some tests for getHeight (Q1).
+-- |Run some tests for getHeight.
 test_getHeight :: IO ()
 test_getHeight = 
     do f testMap1 6
@@ -414,7 +342,7 @@ test_getHeight =
                         handler :: Excep.ErrorCall -> IO ()
                         handler ex = putStrLn $ (yn False) ++ lhs ++ " ** Exception occured **"
 
--- |Run some tests for getHeight (Q1).
+-- |Run some tests for getHeight
 test_getWidth :: IO ()
 test_getWidth = 
     do f testMap1 5
@@ -430,7 +358,7 @@ test_getWidth =
                         handler :: Excep.ErrorCall -> IO ()
                         handler ex = putStrLn $ (yn False) ++ lhs ++ " ** Exception occured **"                        
 
--- |Run some tests for isInbounds (Q2).
+-- |Run some tests for isInbounds.
 test_isInBounds :: IO ()
 test_isInBounds = do f testMap1 (0,0) True
                      f testMap1 (0,(-1)) False
@@ -451,7 +379,7 @@ test_isInBounds = do f testMap1 (0,0) True
                         handler :: Excep.ErrorCall -> IO ()
                         handler ex = putStrLn $ (yn False) ++ lhs ++ " ** Exception occured **"
 
--- |Run some tests for offsetCoord (Q3).
+-- |Run some tests for offsetCoord.
 test_offsetCoord :: IO ()
 test_offsetCoord = 
     do f (5,8) North (5,7)
@@ -472,7 +400,7 @@ test_offsetCoord =
                         handler :: Excep.ErrorCall -> IO ()
                         handler ex = putStrLn $ (yn False) ++ lhs ++ " ** Exception occured **"   
 
--- |Run some tests for getTile (Q4).
+-- |Run some tests for getTile.
 test_getTile:: IO ()
 test_getTile = 
     do f testMap1 (0,0) (Just Floor)
@@ -492,7 +420,7 @@ test_getTile =
                         handler :: Excep.ErrorCall -> IO ()
                         handler ex = putStrLn $ (yn False) ++ lhs ++ " ** Exception occured **"  
 
--- |Run some tests for isPassable (Q5).
+-- |Run some tests for isPassable.
 test_isPassable :: IO ()
 test_isPassable = 
     do f testMap1 (0,0) True
@@ -512,7 +440,7 @@ test_isPassable =
                         handler :: Excep.ErrorCall -> IO ()
                         handler ex = putStrLn $ (yn False) ++ lhs ++ " ** Exception occured **"  
 
--- |Run some tests for move (Q6).
+-- |Run some tests for move.
 test_move :: IO ()
 test_move = 
     do f testMap1 (2,0) West (Right (1,0))
@@ -534,7 +462,7 @@ test_move =
                         handler :: Excep.ErrorCall -> IO ()
                         handler ex = putStrLn $ (yn False) ++ lhs ++ " ** Exception occured **"
 
--- |Run some tests for newPlayer (Q7).
+-- |Run some tests for newPlayer.
 test_newPlayer :: IO ()
 test_newPlayer = 
     do f "Paul" (Player "Paul" (1,1) 100 [])
@@ -549,7 +477,7 @@ test_newPlayer =
                         handler :: Excep.ErrorCall -> IO ()
                         handler ex = putStrLn $ (yn False) ++ lhs ++ " ** Exception occured **"  
 
--- |Run some tests for playerStatus (Q8).
+-- |Run some tests for playerStatus.
 test_playerStatus :: IO ()
 test_playerStatus = 
     do f (Player "Bob" (1,1) 100 [(Item "a camera" Weapon 2), (Item "a Hawaiian shirt" Armour 5), (Item "sandals" Boots 1), (Item "baseball cap" Helm 2)]) "Hero Bob, 100 HP, wielding a camera, wearing baseball cap, a Hawaiian shirt, and sandals."
@@ -566,7 +494,7 @@ test_playerStatus =
                         handler :: Excep.ErrorCall -> IO ()
                         handler ex = putStrLn $ (yn False) ++ lhs ++ " ** Exception occured **"
 
--- |Run some tests for pickupItem (Q9).
+-- |Run some tests for pickupItem.
 test_pickupItem :: IO ()
 test_pickupItem = 
     do f (Player "Sally" (1,1) 74 []) (Item "Sword" Weapon 15) (Player "Sally" (1,1) 74 [Item "Sword" Weapon 15])   -- straight pickup.
@@ -597,7 +525,7 @@ test_rmap = GameMap [ [f,f,f,w,w],
                          o = Door Open
                          r = Water
 
--- |Run some tests for updateMap (Q10).  Only 1 test here to avoid huge
+-- |Run some tests for updateMap.  Only 1 test here to avoid huge
 -- lengthy output in the test log.
 test_updateMap :: IO ()
 test_updateMap = 
@@ -627,7 +555,7 @@ test_openmap = GameMap [ [f,f,f,w,w],
                          o = Door Open
                          r = Water
 
--- |Run some tests for tryOpenDoor (Q11).
+-- |Run some tests for tryOpenDoor.
 test_tryOpenDoor :: IO ()
 test_tryOpenDoor = 
     do f testMap1 (3,1) North testMap1
@@ -644,7 +572,7 @@ test_tryOpenDoor =
                         handler :: Excep.ErrorCall -> IO ()
                         handler ex = putStrLn $ (yn False) ++ lhs ++ " ** Exception occured **"
 
--- |Run some tests for renderTerrain (Q12).
+-- |Run some tests for renderTerrain.
 test_renderTerrain :: IO ()
 test_renderTerrain = 
     do f Floor '.'
@@ -662,7 +590,7 @@ test_renderTerrain =
                         handler :: Excep.ErrorCall -> IO ()
                         handler ex = putStrLn $ (yn False) ++ lhs ++ " ** Exception occured **"
 
--- |Run some tests for renderMap (Q12).
+-- |Run some tests for renderMap.
 test_renderMap :: IO ()
 test_renderMap = 
     do f testMap1 "...##\n.~..#\n.##+#\n.-..#\n.####\n.....\n"
@@ -678,7 +606,7 @@ test_renderMap =
                         handler :: Excep.ErrorCall -> IO ()
                         handler ex = putStrLn $ (yn False) ++ lhs ++ " ** Exception occured **"
 
--- |Run some tests for loadMap (Q13).
+-- |Run some tests for loadMap.
 test_loadMap :: IO ()
 test_loadMap = 
     do f "map1.txt" (Just testMap1)
