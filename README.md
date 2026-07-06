@@ -51,7 +51,7 @@ The repository also includes text map files used for loading, rendering and vali
 ```
 
 ## Files
-- `cwsub.hs` - main implementation, data types and built-in tests.
+- `game_functions.hs` - main implementation, data types and built-in tests.
 - `map1.txt` - small test map containing multiple terrain types.
 - `map2.txt` - simple empty floor map.
 - `map3.txt` - enclosed map with walls and water.
@@ -95,7 +95,7 @@ sudo apt install ghc
 Open the project in GHCi:
 
 ```bash
-ghci cwsub.hs
+ghci game_functions.hs
 ```
 
 Run all built-in tests:
@@ -144,7 +144,7 @@ It uses pure functions for most behaviour and avoids unsafe failure patterns by 
 - Text-file parsing and rendering.
 - Basic pathfinding logic.
 
-- ## Usage Notice
+## Usage Notice
 
 This repository is provided for portfolio and review purposes only.
 
